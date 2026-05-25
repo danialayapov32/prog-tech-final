@@ -1,34 +1,18 @@
 import pandas as pd
-from typing import List, Dict, Any
 
 
 class AirAnalytics:
-    def __init__(self, raw_data: List[Dict[str, Any]]) -> None:
+    def __init__(self, raw_data):
         self.df = pd.DataFrame(raw_data)
 
-        if not self.df.empty:
-            self.df['timestamp'] = pd.to_datetime(self.df['timestamp'])
+        self.df['timestamp'] = pd.to_datetime(self.df['timestamp'])
 
-    def groupby_sensor_and_hour(self) -> pd.DataFrame:
-        if self.df.empty:
-            return pd.DataFrame()
-
+    def groupby_sensor_and_hour(self):
         self.df['hour'] = self.df['timestamp'].dt.floor('h')
 
-        grouped_df = self.df.groupby(['sensor_id', 'hour']).agg({
-            'pm25': 'mean',
-            'co2': 'mean'
-        }).reset_index()
-
+        grouped_df = self.df.groupby(['sensor_id', 'hour']).mean().reset_index()
         return grouped_df
 
-    def check_threshold_alerts(self, pm25_limit: float = 35.0, co2_limit: float = 1000.0) -> pd.DataFrame:
-        if self.df.empty:
-            return pd.DataFrame()
-
-        alerts_df = self.df[
-            (self.df['pm25'] > pm25_limit) |
-            (self.df['co2'] > co2_limit)
-            ]
-
+    def check_threshold_alerts(self):
+        alerts_df = self.df[(self.df['pm25'] > 35.0) | (self.df['co2'] > 1000.0)]
         return alerts_df
