@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import requests
 
 class AirResponderAPI:
     def __init__(self, analytics_engine):
@@ -26,20 +25,5 @@ class AirResponderAPI:
         export_df = alerts_df.copy()
         export_df['timestamp'] = export_df['timestamp'].astype(str)
 
-        json_data = export_df.to_json(orient='records', force_ascii=False, indent=4)
+        return export_df.to_json(orient='records', force_ascii=False, indent=4)
 
-        if not export_df.empty:
-            try:
-                api_url = "https://httpbin.org"
-                headers = {'Content-Type': 'application/json'}
-
-                response = requests.post(api_url, data=json_data.encode('utf-8'), headers=headers)
-
-                if response.status_code == 200:
-                    print(f"[API] Алерты успешно отправлены! Код: {response.status_code}")
-                else:
-                    print(f"[API] Ошибка отправки. Код сервера: {response.status_code}")
-            except Exception as e:
-                print(f"[API] Ошибка сети при отправке алерта: {e}")
-
-        return json_data
